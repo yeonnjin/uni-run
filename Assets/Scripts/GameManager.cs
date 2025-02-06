@@ -7,11 +7,14 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour {
     public static GameManager instance; // 싱글톤을 할당할 전역 변수
 
-    public bool isGameover = false; // 게임 오버 상태
-    public Text scoreText; // 점수를 출력할 UI 텍스트
-    public GameObject gameoverUI; // 게임 오버시 활성화 할 UI 게임 오브젝트
+    public bool isGameover = false;     // 게임 오버 상태          
+    public Text scoreText;              // 점수를 출력할 UI 텍스트
+    public Text bestscoreText;          
+    public GameObject gameoverUI;       // 게임 오버시 활성화 할 UI 게임 오브젝트
+    public GameObject bgm;          
 
-    private int score = 0; // 게임 점수
+    private int score = 0;              // 게임 점수
+    private int bestscore = 0;  
 
     // 게임 시작과 동시에 싱글톤을 구성
     void Awake() {
@@ -32,17 +35,48 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    // 게임 오버 상태에서 게임을 재시작할 수 있게 하는 처리
     void Update() {
-        // 게임 오버 상태에서 게임을 재시작할 수 있게 하는 처리
+        if (isGameover && Input.GetMouseButtonDown(0))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
     }
 
     // 점수를 증가시키는 메서드
     public void AddScore(int newScore) {
-        
+        if (!isGameover)
+        {
+            score += newScore;
+            scoreText.text = "Score : " + score;
+        }
+    }
+
+    private void SetBestScore()
+    {
+        int bestscore = PlayerPrefs.GetInt("BestScore");
+
+        if (score > bestscore)
+        {
+            PlayerPrefs.SetInt("BestScore", score);
+            bestscore = score;
+        }
+
+        bestscoreText.text = "Best Score : " + bestscore;
     }
 
     // 플레이어 캐릭터가 사망시 게임 오버를 실행하는 메서드
     public void OnPlayerDead() {
-        
+        isGameover = true;
+
+        SetBestScore();
+        gameoverUI.SetActive(true);
+
+        bgm.SetActive(false);
     }
 }

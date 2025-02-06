@@ -51,11 +51,13 @@ public class PlayerController : MonoBehaviour {
 
         playerRigidbody.velocity = Vector2.zero;
         isDead = true;
+
+        GameManager.instance.OnPlayerDead();
    }
 
    // 트리거 콜라이더를 가진 장애물과의 충돌을 감지
    private void OnTriggerEnter2D(Collider2D other) {
-        if (other.tag == "Dead" && !isDead)
+        if ("Dead" == other.tag && !isDead)
             Die();
    }
 
